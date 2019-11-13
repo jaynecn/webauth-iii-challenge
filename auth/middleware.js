@@ -1,28 +1,18 @@
 const jwt = require('jsonwebtoken');
+const secrets = require('../config/secrets');
 
-module.exports = {
-  restricted
-}
+module.exports = (req, res, next) => {
 
-
-
-
-function restricted(req, res, next) {
-  // Authorization
   const token = req.headers.authorization;
-  // if (token && inWhiteList(token)) {
-  // if (token && !inBlacklist(token)) {
+
   if (token) {
-    // check token, if good, just next()
     jwt.verify(
       token,
-      'THIS IS THE SECRET',
-      (err, decodedToken) => {
-        if (err) {
-          // this would mean the token is bad
-          res.status(401).json({ message: 'bad token'})
+      secrets.jwtSecret,
+      (error, decodedToken) => {
+        if (error) {
+          res.status(401).json({ message: 'you shall not pass! ' + error.message})
         } else {
-          // happy path
           req.decodedToken = decodedToken;
           next()
         }
